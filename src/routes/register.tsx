@@ -63,7 +63,7 @@ function RegisterPage() {
   });
   const [consentData, setConsentData] = useState(false);
   const [consentShare, setConsentShare] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -74,7 +74,7 @@ function RegisterPage() {
     if (!parsed.success) {
       for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
     }
-    if (!consentData) next.consent = "We need your consent to record gameplay data before you play.";
+    if (!consentData) next["consent"] = "We need your consent to record gameplay data before you play.";
     setErrors(next);
     if (Object.keys(next).length) return;
     register({ ...form, consentShare });
@@ -121,19 +121,19 @@ function RegisterPage() {
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={submit} noValidate>
-            <Field id="name" label="Full name" error={errors.name}>
+            <Field id="name" label="Full name" error={errors["name"]}>
               <Input
                 id="name"
                 className="h-12"
                 value={form.name}
                 onChange={(e) => set("name")(e.target.value)}
                 autoComplete="name"
-                aria-invalid={!!errors.name}
+                aria-invalid={!!errors["name"]}
               />
             </Field>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field id="email" label="DUT email" error={errors.email}>
+              <Field id="email" label="DUT email" error={errors["email"]}>
                 <Input
                   id="email"
                   type="email"
@@ -141,29 +141,29 @@ function RegisterPage() {
                   value={form.email}
                   onChange={(e) => set("email")(e.target.value)}
                   autoComplete="email"
-                  aria-invalid={!!errors.email}
+                  aria-invalid={!!errors["email"]}
                 />
               </Field>
-              <Field id="studentNumber" label="Student number" error={errors.studentNumber}>
+              <Field id="studentNumber" label="Student number" error={errors["studentNumber"]}>
                 <Input
                   id="studentNumber"
                   inputMode="numeric"
                   className="h-12"
                   value={form.studentNumber}
                   onChange={(e) => set("studentNumber")(e.target.value)}
-                  aria-invalid={!!errors.studentNumber}
+                  aria-invalid={!!errors["studentNumber"]}
                 />
               </Field>
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field id="faculty" label="Faculty" error={errors.faculty}>
+              <Field id="faculty" label="Faculty" error={errors["faculty"]}>
                 <select
                   id="faculty"
                   className="h-12 w-full rounded-md border border-input bg-card px-3 text-sm"
                   value={form.faculty}
                   onChange={(e) => set("faculty")(e.target.value)}
-                  aria-invalid={!!errors.faculty}
+                  aria-invalid={!!errors["faculty"]}
                 >
                   <option value="">Select faculty</option>
                   {FACULTIES.map((f) => (
@@ -171,13 +171,13 @@ function RegisterPage() {
                   ))}
                 </select>
               </Field>
-              <Field id="yearOfStudy" label="Year of study" error={errors.yearOfStudy}>
+              <Field id="yearOfStudy" label="Year of study" error={errors["yearOfStudy"]}>
                 <select
                   id="yearOfStudy"
                   className="h-12 w-full rounded-md border border-input bg-card px-3 text-sm"
                   value={form.yearOfStudy}
                   onChange={(e) => set("yearOfStudy")(e.target.value)}
-                  aria-invalid={!!errors.yearOfStudy}
+                  aria-invalid={!!errors["yearOfStudy"]}
                 >
                   <option value="">Select year</option>
                   {["1st year", "2nd year", "3rd year", "4th year", "Postgraduate"].map((y) => (
@@ -212,10 +212,10 @@ function RegisterPage() {
                   support. I can withdraw this any time.
                 </span>
               </label>
-              {errors.consent && (
+              {errors["consent"] && (
                 <p id="consent-error" role="alert" className="mt-2 text-sm text-destructive">
                   <span aria-hidden>⚠ </span>
-                  {errors.consent}
+                  {errors["consent"]}
                 </p>
               )}
             </fieldset>
@@ -245,7 +245,7 @@ function Field({
 }: {
   id: string;
   label: string;
-  error?: string;
+  error?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
