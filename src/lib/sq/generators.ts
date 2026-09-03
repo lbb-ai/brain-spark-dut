@@ -326,7 +326,7 @@ const GRAMMAR: { prompt: string; correct: string; wrong: string[] }[] = [
 ];
 
 function maskWord(word: string, holes: number) {
-  const idx = shuffle([...word.keys()].filter((i) => word[i] !== " ")).slice(0, holes);
+  const idx = shuffle(Array.from({ length: word.length }, (_, i) => i).filter((i) => word[i] !== " ")).slice(0, holes);
   return [...word].map((c, i) => (idx.includes(i) ? "_" : c)).join("");
 }
 
@@ -368,7 +368,7 @@ function wordTask(level: number): Task {
       level,
       prompt: maskWord(entry.word, holes).toUpperCase().split("").join(" "),
       instruction: "Type the complete word (the underscores are missing letters).",
-      hint: tier <= 2 ? `It means: ${entry.syn}` : undefined,
+      ...(tier <= 2 ? { hint: `It means: ${entry.syn}` } : {}),
       answer: entry.word,
       placeholder: "Type the word",
       timeLimitMs: tl,
