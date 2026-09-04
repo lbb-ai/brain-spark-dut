@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as CheckpointDomainRouteImport } from './routes/checkpoint.$domain'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as PlayDomainRouteImport } from './routes/play.$domain'
@@ -55,6 +56,11 @@ const ReportRoute = ReportRouteImport.update({
   path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckpointDomainRoute = CheckpointDomainRouteImport.update({
   id: '/checkpoint/$domain',
   path: '/checkpoint/$domain',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
+  '/settings': typeof SettingsRoute
   '/checkpoint/$domain': typeof CheckpointDomainRoute
   '/play/$domain': typeof PlayDomainRoute
   '/play/': typeof PlayIndexRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
+  '/settings': typeof SettingsRoute
   '/checkpoint/$domain': typeof CheckpointDomainRoute
   '/play/$domain': typeof PlayDomainRoute
   '/play': typeof PlayIndexRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
+  '/settings': typeof SettingsRoute
   '/checkpoint/$domain': typeof CheckpointDomainRoute
   '/play/$domain': typeof PlayDomainRoute
   '/play/': typeof PlayIndexRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/report'
+    | '/settings'
     | '/checkpoint/$domain'
     | '/play/$domain'
     | '/play/'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/report'
+    | '/settings'
     | '/checkpoint/$domain'
     | '/play/$domain'
     | '/play'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/report'
+    | '/settings'
     | '/checkpoint/$domain'
     | '/play/$domain'
     | '/play/'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   ReportRoute: typeof ReportRoute
+  SettingsRoute: typeof SettingsRoute
   CheckpointDomainRoute: typeof CheckpointDomainRoute
   PlayDomainRoute: typeof PlayDomainRoute
   PlayIndexRoute: typeof PlayIndexRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkpoint/$domain': {
       id: '/checkpoint/$domain'
       path: '/checkpoint/$domain'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   ReportRoute: ReportRoute,
+  SettingsRoute: SettingsRoute,
   CheckpointDomainRoute: CheckpointDomainRoute,
   PlayDomainRoute: PlayDomainRoute,
   PlayIndexRoute: PlayIndexRoute,
