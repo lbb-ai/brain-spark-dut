@@ -21,6 +21,8 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as CheckpointDomainRouteImport } from './routes/checkpoint.$domain'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as PlayDomainRouteImport } from './routes/play.$domain'
+import { Route as StaffIndexRouteImport } from './routes/staff.index'
+import { Route as StaffStudentIdRouteImport } from './routes/staff.$studentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +84,16 @@ const PlayDomainRoute = PlayDomainRouteImport.update({
   path: '/play/$domain',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/staff/',
+  path: '/staff/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffStudentIdRoute = StaffStudentIdRouteImport.update({
+  id: '/staff/$studentId',
+  path: '/staff/$studentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,7 +107,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/checkpoint/$domain': typeof CheckpointDomainRoute
   '/play/$domain': typeof PlayDomainRoute
+  '/staff/$studentId': typeof StaffStudentIdRoute
   '/play/': typeof PlayIndexRoute
+  '/staff/': typeof StaffIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,7 +123,9 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/checkpoint/$domain': typeof CheckpointDomainRoute
   '/play/$domain': typeof PlayDomainRoute
+  '/staff/$studentId': typeof StaffStudentIdRoute
   '/play': typeof PlayIndexRoute
+  '/staff': typeof StaffIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,7 +140,9 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/checkpoint/$domain': typeof CheckpointDomainRoute
   '/play/$domain': typeof PlayDomainRoute
+  '/staff/$studentId': typeof StaffStudentIdRoute
   '/play/': typeof PlayIndexRoute
+  '/staff/': typeof StaffIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,7 +158,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/checkpoint/$domain'
     | '/play/$domain'
+    | '/staff/$studentId'
     | '/play/'
+    | '/staff/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -154,7 +174,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/checkpoint/$domain'
     | '/play/$domain'
+    | '/staff/$studentId'
     | '/play'
+    | '/staff'
   id:
     | '__root__'
     | '/'
@@ -168,7 +190,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/checkpoint/$domain'
     | '/play/$domain'
+    | '/staff/$studentId'
     | '/play/'
+    | '/staff/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,7 +207,9 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   CheckpointDomainRoute: typeof CheckpointDomainRoute
   PlayDomainRoute: typeof PlayDomainRoute
+  StaffStudentIdRoute: typeof StaffStudentIdRoute
   PlayIndexRoute: typeof PlayIndexRoute
+  StaffIndexRoute: typeof StaffIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +298,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayDomainRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staff/': {
+      id: '/staff/'
+      path: '/staff'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/$studentId': {
+      id: '/staff/$studentId'
+      path: '/staff/$studentId'
+      fullPath: '/staff/$studentId'
+      preLoaderRoute: typeof StaffStudentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -287,7 +327,9 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   CheckpointDomainRoute: CheckpointDomainRoute,
   PlayDomainRoute: PlayDomainRoute,
+  StaffStudentIdRoute: StaffStudentIdRoute,
   PlayIndexRoute: PlayIndexRoute,
+  StaffIndexRoute: StaffIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
