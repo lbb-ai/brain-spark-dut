@@ -7,6 +7,8 @@ import { DOMAINS, DOMAIN_MAP, type DomainId } from "@/lib/sq/domains";
 import { overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { useSq } from "@/lib/sq/store";
 import type { Band } from "@/lib/sq/types";
+import { Lock } from "lucide-react";
+
 
 export const Route = createFileRoute("/staff/")({
   head: () => ({
