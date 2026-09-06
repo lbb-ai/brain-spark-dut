@@ -111,7 +111,7 @@ function ProfilePage() {
                 {[
                   ["Level", levelFromXp(progress.xp)],
                   ["XP", progress.xp],
-                  ["Streak", `${progress.streak}🔥`],
+                  ["Streak", `${progress.streak} days`],
                 ].map(([k, v]) => (
                   <div key={k as string} className="rounded-xl border border-border bg-muted/40 p-3">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground">{k}</p>

@@ -100,9 +100,7 @@ function StaffCaseload() {
       {hidden > 0 && (
       <Card className="mt-6 border-warning/40 bg-warning/5">
         <p className="text-sm">
-          <span aria-hidden className="mr-2">
-            🔒
-          </span>
+          <Lock className="mr-2 inline h-4 w-4 align-[-2px]" aria-hidden />
           {hidden} student{hidden === 1 ? "" : "s"} have chosen not to share their screening results.
           Their data is not accessible here, in line with POPIA.
         </p>

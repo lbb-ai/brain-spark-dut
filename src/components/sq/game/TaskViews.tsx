@@ -163,7 +163,7 @@ function McqOrInput({ task, onFinish, sound }: TaskViewProps) {
           </Button>
         )}
         {hintUsed && task.hint && (
-          <p className="rounded-lg bg-cyan/10 px-3 py-2 text-sm text-foreground">💡 {task.hint}</p>
+          <p className="rounded-lg bg-cyan/10 px-3 py-2 text-sm text-foreground">Hint: {task.hint}</p>
         )}
         {status === "right" && (
           <p className="font-semibold text-success" role="status">

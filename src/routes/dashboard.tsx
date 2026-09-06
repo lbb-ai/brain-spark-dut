@@ -6,6 +6,7 @@ import { BadgePill, BandChip, Card, Meter, SectionTitle, Stat } from "@/componen
 import { DOMAINS, DOMAIN_MAP, tierForLevel } from "@/lib/sq/domains";
 import { recentCheckpoints, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { Button } from "@/components/ui/button";
+import { Award, Flame } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -56,7 +57,7 @@ function Dashboard() {
           <div>
             <p className="text-sm text-white/65">Welcome back,</p>
             <h1 className="font-display text-3xl font-black text-white sm:text-4xl">
-              {firstName} 👋
+              {firstName}
             </h1>
             <p className="mt-2 max-w-lg text-white/70">
               {completion < 30
@@ -95,7 +96,13 @@ function Dashboard() {
               {500 - xpIntoLevel(progress.xp)} XP to level {level + 1}
             </p>
             <p className="mt-3 text-sm text-white">
-              🔥 {progress.streak}-day streak · 🏅 {progress.badges.length} badges
+              <span className="inline-flex items-center gap-1.5">
+                <Flame className="h-4 w-4" aria-hidden /> {progress.streak}-day streak
+              </span>
+              <span className="mx-2 text-white/40">·</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Award className="h-4 w-4" aria-hidden /> {progress.badges.length} badges
+              </span>
             </p>
           </div>
         </div>
