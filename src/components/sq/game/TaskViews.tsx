@@ -419,7 +419,7 @@ function ReactionPanel({ task, onFinish, sound }: { task: ReactionTask } & Omit<
             : "border-border bg-navy text-navy-foreground",
         )}
       >
-        {state === "go" ? "TAP NOW ⚡" : "Wait for it…"}
+        {state === "go" ? "TAP NOW" : "Wait for it…"}
       </button>
       <p className="mt-3 text-sm text-muted-foreground" role="status">
         Average: {avg ? `${avg} ms` : "—"} · Early taps: {errors}

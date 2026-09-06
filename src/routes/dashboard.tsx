@@ -110,7 +110,7 @@ function Dashboard() {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Screening progress" value={`${completion}%`} hint="Across all six domains" />
-        <Stat label="Levels cleared" value={progress.levelRuns.length} hint="This account" />
+        <Stat label="Levels cleared" value={DOMAINS.reduce((n, d) => n + Math.max(0, (progress.levels[d.id] ?? 1) - 1), 0)} hint="Across all six domains" />
         <Stat label="Checkpoints" value={progress.checkpoints.length} hint="Challenge rounds done" />
         <Stat
           label="Attempts logged"
