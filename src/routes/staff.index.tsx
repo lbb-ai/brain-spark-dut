@@ -97,6 +97,7 @@ function StaffCaseload() {
         <Stat label="Private (not shared)" value={hidden} hint="Not visible to staff" />
       </div>
 
+      {hidden > 0 && (
       <Card className="mt-6 border-warning/40 bg-warning/5">
         <p className="text-sm">
           <span aria-hidden className="mr-2">
@@ -106,6 +107,7 @@ function StaffCaseload() {
           Their data is not accessible here, in line with POPIA.
         </p>
       </Card>
+      )}
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
         <div>
