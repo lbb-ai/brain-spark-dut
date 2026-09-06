@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Award, Gamepad2 } from "lucide-react";
 import { BAND_META } from "@/lib/sq/analysis";
 import type { Band } from "@/lib/sq/types";
 
@@ -132,7 +133,7 @@ export function Disclaimer({ className }: { className?: string }) {
 export function BadgePill({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary">
-      <span aria-hidden>🏅</span>
+      <Award className="h-3.5 w-3.5" aria-hidden />
       {label}
     </span>
   );
@@ -141,9 +142,7 @@ export function BadgePill({ label }: { label: string }) {
 export function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
   return (
     <div className="card-base flex flex-col items-center gap-3 p-10 text-center">
-      <span aria-hidden className="text-3xl">
-        🎮
-      </span>
+      <Gamepad2 className="h-8 w-8 text-primary" aria-hidden />
       <h3 className="font-display text-lg font-semibold">{title}</h3>
       <p className="max-w-md text-sm text-muted-foreground">{body}</p>
       {action}

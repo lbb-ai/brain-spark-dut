@@ -7,6 +7,8 @@ import { DOMAINS, DOMAIN_MAP, type DomainId } from "@/lib/sq/domains";
 import { overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { useSq } from "@/lib/sq/store";
 import type { Band } from "@/lib/sq/types";
+import { Lock } from "lucide-react";
+
 
 export const Route = createFileRoute("/staff/")({
   head: () => ({
@@ -97,15 +99,15 @@ function StaffCaseload() {
         <Stat label="Private (not shared)" value={hidden} hint="Not visible to staff" />
       </div>
 
+      {hidden > 0 && (
       <Card className="mt-6 border-warning/40 bg-warning/5">
         <p className="text-sm">
-          <span aria-hidden className="mr-2">
-            🔒
-          </span>
+          <Lock className="mr-2 inline h-4 w-4 align-[-2px]" aria-hidden />
           {hidden} student{hidden === 1 ? "" : "s"} have chosen not to share their screening results.
           Their data is not accessible here, in line with POPIA.
         </p>
       </Card>
+      )}
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
         <div>

@@ -163,7 +163,7 @@ function McqOrInput({ task, onFinish, sound }: TaskViewProps) {
           </Button>
         )}
         {hintUsed && task.hint && (
-          <p className="rounded-lg bg-cyan/10 px-3 py-2 text-sm text-foreground">💡 {task.hint}</p>
+          <p className="rounded-lg bg-cyan/10 px-3 py-2 text-sm text-foreground">Hint: {task.hint}</p>
         )}
         {status === "right" && (
           <p className="font-semibold text-success" role="status">
@@ -419,7 +419,7 @@ function ReactionPanel({ task, onFinish, sound }: { task: ReactionTask } & Omit<
             : "border-border bg-navy text-navy-foreground",
         )}
       >
-        {state === "go" ? "TAP NOW ⚡" : "Wait for it…"}
+        {state === "go" ? "TAP NOW" : "Wait for it…"}
       </button>
       <p className="mt-3 text-sm text-muted-foreground" role="status">
         Average: {avg ? `${avg} ms` : "—"} · Early taps: {errors}

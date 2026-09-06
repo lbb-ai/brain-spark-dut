@@ -125,7 +125,7 @@ function CheckpointPage() {
       {phase === "done" && (
         <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
           <Card className="animate-pop p-8">
-            <h1 className="font-display text-3xl font-black">Checkpoint complete 🎉</h1>
+            <h1 className="font-display text-3xl font-black">Checkpoint complete</h1>
             <p className="mt-2 text-muted-foreground">
               {consistency >= 80
                 ? "Your checkpoint matches your normal play closely — that's a reliable signal."

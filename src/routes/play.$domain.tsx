@@ -233,7 +233,7 @@ function GamePage() {
 
             {newBadges.length > 0 && (
               <p className="mt-4 rounded-xl bg-primary/8 px-4 py-3 text-sm font-semibold text-primary">
-                🏅 New badge{newBadges.length > 1 ? "s" : ""}: {newBadges.join(", ")}
+                New badge{newBadges.length > 1 ? "s" : ""}: {newBadges.join(", ")}
               </p>
             )}
 

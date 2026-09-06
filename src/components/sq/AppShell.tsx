@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import { useSq, levelFromXp } from "@/lib/sq/store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Flame } from "lucide-react";
 
 interface NavItem {
   to: string;
@@ -91,7 +92,10 @@ export function AppShell({
               <div className="hidden items-center gap-3 rounded-full border border-border bg-muted/60 px-3 py-1.5 text-xs font-semibold sm:flex">
                 <span className="text-primary">Lv {levelFromXp(progress.xp)}</span>
                 <span className="text-muted-foreground">{progress.xp} XP</span>
-                <span className="text-warning">{progress.streak}🔥</span>
+                <span className="flex items-center gap-1 text-warning">
+                  {progress.streak}
+                  <Flame className="h-3.5 w-3.5" aria-hidden />
+                </span>
               </div>
             )}
             {currentUser ? (

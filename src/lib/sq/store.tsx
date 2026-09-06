@@ -113,13 +113,20 @@ export function SqProvider({ children }: { children: ReactNode }) {
       const raw = localStorage.getItem(KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as SqState;
-        setState({ ...initialState(), ...parsed });
+        // Keep anything the user already did before hydration finished
+        // (e.g. signing in immediately after first paint).
+        setState((live) => ({
+          ...initialState(),
+          ...parsed,
+          currentUserId: live.currentUserId ?? parsed.currentUserId ?? null,
+        }));
       }
     } catch {
       /* ignore corrupt storage */
     }
     setReady(true);
   }, []);
+
 
   useEffect(() => {
     if (!ready) return;
