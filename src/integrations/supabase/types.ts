@@ -14,16 +14,347 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attempts: {
+        Row: {
+          at: string
+          attempts: number
+          correct: boolean
+          domain: string
+          hint_used: boolean
+          id: string
+          is_checkpoint: boolean
+          level: number
+          response_ms: number
+          task_kind: string
+          user_id: string
+        }
+        Insert: {
+          at?: string
+          attempts?: number
+          correct: boolean
+          domain: string
+          hint_used?: boolean
+          id?: string
+          is_checkpoint?: boolean
+          level: number
+          response_ms: number
+          task_kind: string
+          user_id: string
+        }
+        Update: {
+          at?: string
+          attempts?: number
+          correct?: boolean
+          domain?: string
+          hint_used?: boolean
+          id?: string
+          is_checkpoint?: boolean
+          level?: number
+          response_ms?: number
+          task_kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor: string
+          actor_id: string | null
+          at: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor?: string
+          actor_id?: string | null
+          at?: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor?: string
+          actor_id?: string | null
+          at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      case_notes: {
+        Row: {
+          action: string
+          at: string
+          author: string
+          author_id: string | null
+          id: string
+          note: string
+          student_id: string
+        }
+        Insert: {
+          action: string
+          at?: string
+          author?: string
+          author_id?: string | null
+          id?: string
+          note?: string
+          student_id: string
+        }
+        Update: {
+          action?: string
+          at?: string
+          author?: string
+          author_id?: string | null
+          id?: string
+          note?: string
+          student_id?: string
+        }
+        Relationships: []
+      }
+      checkpoints: {
+        Row: {
+          accuracy: number
+          at: string
+          at_level: number
+          consistency: number
+          domain: string
+          gameplay_accuracy: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          accuracy: number
+          at?: string
+          at_level: number
+          consistency: number
+          domain: string
+          gameplay_accuracy: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          accuracy?: number
+          at?: string
+          at_level?: number
+          consistency?: number
+          domain?: string
+          gameplay_accuracy?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      game_settings: {
+        Row: {
+          domain: string
+          enabled: boolean
+        }
+        Insert: {
+          domain: string
+          enabled?: boolean
+        }
+        Update: {
+          domain?: string
+          enabled?: boolean
+        }
+        Relationships: []
+      }
+      level_runs: {
+        Row: {
+          accuracy: number
+          at: string
+          avg_response_ms: number
+          domain: string
+          duration_ms: number
+          id: string
+          level: number
+          retried: boolean
+          user_id: string
+        }
+        Insert: {
+          accuracy: number
+          at?: string
+          avg_response_ms: number
+          domain: string
+          duration_ms: number
+          id?: string
+          level: number
+          retried?: boolean
+          user_id: string
+        }
+        Update: {
+          accuracy?: number
+          at?: string
+          avg_response_ms?: number
+          domain?: string
+          duration_ms?: number
+          id?: string
+          level?: number
+          retried?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          consent_share: boolean
+          created_at: string
+          email: string
+          faculty: string | null
+          id: string
+          name: string
+          student_number: string | null
+          year_of_study: string | null
+        }
+        Insert: {
+          consent_share?: boolean
+          created_at?: string
+          email?: string
+          faculty?: string | null
+          id: string
+          name?: string
+          student_number?: string | null
+          year_of_study?: string | null
+        }
+        Update: {
+          consent_share?: boolean
+          created_at?: string
+          email?: string
+          faculty?: string | null
+          id?: string
+          name?: string
+          student_number?: string | null
+          year_of_study?: string | null
+        }
+        Relationships: []
+      }
+      progress: {
+        Row: {
+          badges: string[]
+          last_played_day: string | null
+          levels: Json
+          streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          badges?: string[]
+          last_played_day?: string | null
+          levels?: Json
+          streak?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          badges?: string[]
+          last_played_day?: string | null
+          levels?: Json
+          streak?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          contact_preference: string
+          created_at: string
+          email_status: string
+          id: string
+          message: string
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          contact_preference?: string
+          created_at?: string
+          email_status?: string
+          id?: string
+          message?: string
+          status?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          contact_preference?: string
+          created_at?: string
+          email_status?: string
+          id?: string
+          message?: string
+          status?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          domains: Json
+          id: string
+          overall: string
+          summary_text: string
+          total_attempts: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          domains: Json
+          id?: string
+          overall: string
+          summary_text: string
+          total_attempts?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          domains?: Json
+          id?: string
+          overall?: string
+          summary_text?: string
+          total_attempts?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_view_student: { Args: { _student: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "staff" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +481,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "staff", "admin"],
+    },
   },
 } as const
