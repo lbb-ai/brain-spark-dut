@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DOMAIN_IDS, type DomainId } from "./domains";
 import { buildReport } from "./analysis";
 import { emptyProgress } from "./seed";
+import { sendReferralEmail } from "./referral-email.server";
 import type {
   AccessibilitySettings,
   AttemptRecord,
@@ -688,17 +689,12 @@ export function SqProvider({ children }: { children: ReactNode }) {
         ],
       }));
       try {
-        const res = await fetch("/api/public/referral-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ referralId: data.id }),
-        });
-        const body = (await res.json()) as { emailStatus?: string };
-        if (body.emailStatus) {
+        const result = await sendReferralEmail({ data: { referralId: data.id } });
+        if (result.emailStatus) {
           setState((s) => ({
             ...s,
             referrals: s.referrals.map((r) =>
-              r.id === data.id ? { ...r, emailStatus: body.emailStatus! } : r,
+              r.id === data.id ? { ...r, emailStatus: result.emailStatus } : r,
             ),
           }));
         }

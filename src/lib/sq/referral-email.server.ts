@@ -1,4 +1,4 @@
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { DOMAIN_MAP } from "@/lib/sq/domains";
 import { BAND_META } from "@/lib/sq/analysis";
@@ -8,17 +8,13 @@ const DISABILITY_UNIT_EMAIL =
   process.env["DISABILITY_UNIT_EMAIL"] ?? "disability-unit@university.ac.za";
 const FROM_EMAIL = process.env["RESEND_FROM_EMAIL"] ?? "SkillQuest <noreply@university.ac.za>";
 
-export const APIRoute = createAPIFileRoute("/api/public/referral-email")({
-  POST: async ({ request }) => {
-    let body: { referralId?: string };
-    try {
-      body = (await request.json()) as { referralId?: string };
-    } catch {
-      return json({ error: "Invalid JSON body" }, 400);
-    }
-
-    const { referralId } = body;
-    if (!referralId) return json({ error: "Missing referralId" }, 400);
+export const sendReferralEmail = createServerFn({ method: "POST" })
+  .validator((data: { referralId: string }) => {
+    if (!data?.referralId) throw new Error("Missing referralId");
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const { referralId } = data;
 
     // ── Look up referral + profile + latest report ──────────────────────
     const { data: referral, error: refErr } = await supabaseAdmin
@@ -28,7 +24,7 @@ export const APIRoute = createAPIFileRoute("/api/public/referral-email")({
       .maybeSingle();
 
     if (refErr || !referral) {
-      return json({ error: "Referral not found", emailStatus: "failed" }, 404);
+      return { emailStatus: "failed" as const, error: "Referral not found" };
     }
 
     const { data: profile } = await supabaseAdmin
@@ -47,7 +43,7 @@ export const APIRoute = createAPIFileRoute("/api/public/referral-email")({
 
     if (!profile) {
       await updateEmailStatus(referralId, "failed");
-      return json({ error: "Student profile not found", emailStatus: "failed" }, 404);
+      return { emailStatus: "failed" as const, error: "Student profile not found" };
     }
 
     // ── Compose email ───────────────────────────────────────────────────
@@ -62,12 +58,12 @@ export const APIRoute = createAPIFileRoute("/api/public/referral-email")({
       faculty: profile.faculty,
       yearOfStudy: profile.year_of_study,
       overallBand: overall,
-      summaryText: latestReport?.summary_text,
-      totalAttempts: latestReport?.total_attempts,
+      summaryText: latestReport?.summary_text ?? null,
+      totalAttempts: latestReport?.total_attempts ?? null,
       domains,
       message: referral.message,
       contactPreference: referral.contact_preference,
-      reportDate: latestReport?.created_at,
+      reportDate: latestReport?.created_at ?? null,
     });
 
     // ── Send via Resend ─────────────────────────────────────────────────
@@ -85,18 +81,17 @@ export const APIRoute = createAPIFileRoute("/api/public/referral-email")({
       if (sendErr) {
         console.error("[referral-email] Resend error:", sendErr);
         await updateEmailStatus(referralId, "failed");
-        return json({ error: "Email send failed", emailStatus: "failed" }, 502);
+        return { emailStatus: "failed" as const, error: "Email send failed" };
       }
 
       await updateEmailStatus(referralId, "sent");
-      return json({ emailStatus: "sent" }, 200);
+      return { emailStatus: "sent" as const };
     } catch (err) {
       console.error("[referral-email] Unexpected error:", err);
       await updateEmailStatus(referralId, "failed");
-      return json({ error: "Email service unavailable", emailStatus: "failed" }, 503);
+      return { emailStatus: "failed" as const, error: "Email service unavailable" };
     }
-  },
-});
+  });
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -105,13 +100,6 @@ async function updateEmailStatus(referralId: string, status: string) {
     .from("referrals")
     .update({ email_status: status, updated_at: new Date().toISOString() })
     .eq("id", referralId);
-}
-
-function json(data: unknown, status: number) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "content-type": "application/json" },
-  });
 }
 
 function buildEmailHtml(input: {
@@ -151,13 +139,14 @@ function buildEmailHtml(input: {
         .map((d) => {
           const meta = DOMAIN_MAP[d.domain];
           const band = BAND_META[d.band];
+          const color = d.band === "low" ? "#16a34a" : d.band === "moderate" ? "#d97706" : "#dc2626";
           return `
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-weight:600;">${meta.skillLabel}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${meta.name}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.levelReached}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.accuracy}%</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:center;color:${band.tone.includes("success") ? "#16a34a" : band.tone.includes("warning") ? "#d97706" : "#dc2626"};">${band.label}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:center;color:${color};">${band.label}</td>
         </tr>`;
         })
         .join("")

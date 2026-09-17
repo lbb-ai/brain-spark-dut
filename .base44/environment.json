@@ -2,5 +2,30 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "RESEND_API_KEY",
+      "description": "API key from resend.com — create a free account, add your domain, and copy the API key from Dashboard → API Keys",
+      "requiredAtBoot": false,
+      "generatedForDevelopment": true
+    },
+    {
+      "name": "SUPABASE_SERVICE_ROLE_KEY",
+      "description": "Supabase service role key — find it in Supabase Dashboard → Settings → API → service_role secret key",
+      "requiredAtBoot": false,
+      "generatedForDevelopment": true
+    },
+    {
+      "name": "DISABILITY_UNIT_EMAIL",
+      "description": "The email address of the university Disability Unit that should receive referral notifications",
+      "requiredAtBoot": false,
+      "generatedForDevelopment": true
+    },
+    {
+      "name": "RESEND_FROM_EMAIL",
+      "description": "The verified sender email address for outgoing referral emails (e.g. SkillQuest <noreply@yourdomain.com>) — must be a domain verified in your Resend account",
+      "requiredAtBoot": false,
+      "generatedForDevelopment": true
+    }
+  ]
 }

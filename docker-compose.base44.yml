@@ -11,6 +11,7 @@ services:
       - "3000:3000"
     env_file:
       - ./.env
+      - /run/base44/app.env
     environment:
       # Vite >= 6.1 appends this to allowedHosts; the platform sets it to the sandbox domain.
       - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
