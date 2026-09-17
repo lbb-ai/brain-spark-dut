@@ -7,6 +7,7 @@ import { DOMAINS, DOMAIN_MAP, tierForLevel } from "@/lib/sq/domains";
 import { recentCheckpoints, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { Button } from "@/components/ui/button";
 import { Award, Flame } from "lucide-react";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -38,6 +39,7 @@ function Dashboard() {
     }
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   const summaries = summariseAll(progress);
@@ -240,7 +242,8 @@ function Dashboard() {
           <Card className="mt-4 border-primary/30 bg-primary/5">
             <h3 className="font-display font-bold">Need to talk to someone?</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              The DUT Disability Unit offers confidential support and professional assessment.
+              The [UNIVERSITY NAME] Disability Unit offers confidential support and professional
+              assessment.
             </p>
             <Button asChild className="mt-3 w-full">
               <Link to="/report" hash="support">

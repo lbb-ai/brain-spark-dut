@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useSq, levelFromXp } from "@/lib/sq/store";
 import { screeningCompletion } from "@/lib/sq/analysis";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -35,6 +36,7 @@ function ProfilePage() {
     if (ready && !currentUser) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   return (
@@ -80,7 +82,7 @@ function ProfilePage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <Label htmlFor="consent-switch" className="text-base font-semibold">
-                  Share my screening report with the DUT Disability Unit
+                  Share my screening report with the [UNIVERSITY NAME] Disability Unit
                 </Label>
                 <p className="mt-1 text-sm text-muted-foreground">
                   When on, authorised Disability Unit staff can see your skill profile and history so

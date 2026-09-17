@@ -77,7 +77,7 @@ interface SqContextValue {
   progress: StudentProgress;
   progressFor: (id: string) => StudentProgress;
   login: (email: string, password: string) => Promise<{ user: SqUser | null; error?: string }>;
-  register: (input: RegisterInput) => Promise<{ user: SqUser | null; error?: string }>;
+  register: (input: RegisterInput) => Promise<{ user: SqUser | null; error?: string; needsEmailConfirmation?: boolean }>;
   logout: () => Promise<void>;
   recordAttempts: (attempts: Omit<AttemptRecord, "id" | "at">[]) => void;
   recordLevelRun: (run: Omit<LevelRecord, "at">) => void;
@@ -305,23 +305,53 @@ export function SqProvider({ children }: { children: ReactNode }) {
         supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", userId),
       ]);
+
+      // Auto-create profile + role if missing (e.g. after email confirmation
+      // when no database trigger exists to seed them at signup time).
+      let profileData = profile;
+      let rolesData = roles;
+      if (!profileData) {
+        const { data: authUser } = await supabase.auth.getUser();
+        const meta = (authUser?.user?.user_metadata ?? {}) as Record<string, unknown>;
+        const { data: inserted } = await supabase
+          .from("profiles")
+          .insert({
+            id: userId,
+            email: authUser?.user?.email ?? "",
+            name: (meta.name as string) ?? authUser?.user?.email ?? "",
+            student_number: (meta.student_number as string) ?? null,
+            faculty: (meta.faculty as string) ?? null,
+            year_of_study: (meta.year_of_study as string) ?? null,
+            consent_share: (meta.consent_share as boolean) ?? false,
+          })
+          .select("*")
+          .maybeSingle();
+        if (inserted) profileData = inserted;
+        await supabase.from("user_roles").insert({ user_id: userId, role: "student" });
+        const { data: newRoles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId);
+        rolesData = newRoles;
+      }
+
       const rank = { student: 0, staff: 1, admin: 2 } as const;
       let role: SqUser["role"] = "student";
-      for (const r of roles ?? []) {
+      for (const r of rolesData ?? []) {
         const candidate = r.role as SqUser["role"];
         if (rank[candidate] > rank[role]) role = candidate;
       }
-      if (profile) {
+      if (profileData) {
         setCurrentUser({
-          id: profile.id,
-          name: profile.name || profile.email,
-          email: profile.email,
+          id: profileData.id,
+          name: profileData.name || profileData.email,
+          email: profileData.email,
           role,
-          studentNumber: profile.student_number ?? undefined,
-          faculty: profile.faculty ?? undefined,
-          yearOfStudy: profile.year_of_study ?? undefined,
-          consentShare: profile.consent_share,
-          createdAt: profile.created_at,
+          studentNumber: profileData.student_number ?? undefined,
+          faculty: profileData.faculty ?? undefined,
+          yearOfStudy: profileData.year_of_study ?? undefined,
+          consentShare: profileData.consent_share,
+          createdAt: profileData.created_at,
         });
       }
       await loadAll(userId);
@@ -456,6 +486,11 @@ export function SqProvider({ children }: { children: ReactNode }) {
         },
       });
       if (error || !data.user) return { user: null, error: error?.message ?? "Sign up failed" };
+      // Email confirmation is enabled — no session is returned until the user
+      // verifies their email. Tell the UI to show a "check your inbox" state.
+      if (!data.session) {
+        return { user: null, needsEmailConfirmation: true };
+      }
       const user: SqUser = {
         id: data.user.id,
         name: input.name,
@@ -467,10 +502,8 @@ export function SqProvider({ children }: { children: ReactNode }) {
         consentShare: input.consentShare,
         createdAt: new Date().toISOString(),
       };
-      if (data.session) {
-        setCurrentUser(user);
-        void loadAll(user.id);
-      }
+      setCurrentUser(user);
+      void loadAll(user.id);
       return { user };
     },
 

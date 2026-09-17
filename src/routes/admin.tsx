@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { DOMAINS } from "@/lib/sq/domains";
 import { useSq } from "@/lib/sq/store";
 import type { Role } from "@/lib/sq/types";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -45,6 +46,7 @@ function AdminPage() {
     if (ready && (!currentUser || currentUser.role !== "admin")) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser || currentUser.role !== "admin") return null;
 
   const students = state.users.filter((u) => u.role === "student");

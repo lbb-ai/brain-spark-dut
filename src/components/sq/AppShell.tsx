@@ -151,8 +151,8 @@ export function AppShell({
       <footer className="border-t border-border bg-card/60 py-6">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 text-xs text-muted-foreground sm:px-6">
           <p>
-            SkillQuest is a screening companion built for the Durban University of Technology
-            Disability Unit. It does not diagnose any condition.
+            SkillQuest is a screening companion built for the [UNIVERSITY NAME] Disability
+            Unit. It does not diagnose any condition.
           </p>
           <p>Gameplay data is handled in line with POPIA principles. You control what is shared.</p>
         </div>

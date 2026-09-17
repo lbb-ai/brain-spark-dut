@@ -8,6 +8,7 @@ import { buildLevel } from "@/lib/sq/generators";
 import { GameRunner, Countdown, type TaskResult } from "@/components/sq/game/GameRunner";
 import { useSq } from "@/lib/sq/store";
 import { nextLevel } from "@/lib/sq/analysis";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/play/$domain")({
   head: ({ params }) => {
@@ -137,6 +138,7 @@ function GamePage() {
     return "That level was a tough one. We've eased the next one — keep going, it all counts.";
   }, [accuracy]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   if (!valid || disabled) {

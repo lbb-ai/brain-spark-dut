@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DOMAIN_MAP } from "@/lib/sq/domains";
 import { BAND_META, overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { useSq } from "@/lib/sq/store";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/report")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/report")({
       {
         name: "description",
         content:
-          "A plain-language SkillQuest skill profile across six domains, with a clear route to DUT Disability Unit support. Screening only, never a diagnosis.",
+          "A plain-language SkillQuest skill profile across six domains, with a clear route to [UNIVERSITY NAME] Disability Unit support. Screening only, never a diagnosis.",
       },
       { property: "og:title", content: "My SkillQuest screening report" },
       {
@@ -35,6 +36,7 @@ function ReportPage() {
     if (ready && !currentUser) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   const domains = summariseAll(progress);
@@ -159,7 +161,7 @@ function ReportPage() {
       <section id="support" className="mt-10 scroll-mt-24">
         <Card className="surface-night p-8">
           <h2 className="font-display text-2xl font-bold text-white">
-            Talk to the DUT Disability Unit
+            Talk to the [UNIVERSITY NAME] Disability Unit
           </h2>
           <p className="mt-2 max-w-2xl text-white/70">
             The Disability Unit offers confidential conversations, professional assessment and
@@ -169,17 +171,27 @@ function ReportPage() {
           <dl className="mt-5 grid gap-4 text-sm text-white/80 sm:grid-cols-3">
             <div>
               <dt className="font-semibold text-white">Where</dt>
-              <dd>Student Services, Steve Biko Campus</dd>
+              <dd className="rounded-md border border-dashed border-white/30 px-2 py-1 text-white/60">
+                [Disability Unit location — to be added]
+              </dd>
             </div>
             <div>
               <dt className="font-semibold text-white">Email</dt>
-              <dd>disabilityunit@dut.ac.za</dd>
+              <dd className="rounded-md border border-dashed border-white/30 px-2 py-1 text-white/60">
+                [Disability Unit email — to be added]
+              </dd>
             </div>
             <div>
               <dt className="font-semibold text-white">Booking</dt>
-              <dd>Walk-in or request a call-back below</dd>
+              <dd className="rounded-md border border-dashed border-white/30 px-2 py-1 text-white/60">
+                [Booking link / process — to be added]
+              </dd>
             </div>
           </dl>
+          <p className="mt-3 text-xs text-white/40">
+            Placeholder contact details — replace with the real Disability Unit's information before
+            launch.
+          </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Button
               size="lg"

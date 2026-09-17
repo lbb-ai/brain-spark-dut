@@ -8,6 +8,7 @@ import { overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysi
 import { useSq } from "@/lib/sq/store";
 import type { Band } from "@/lib/sq/types";
 import { Lock } from "lucide-react";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 
 export const Route = createFileRoute("/staff/")({
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/staff/")({
       { property: "og:title", content: "SkillQuest Disability Unit caseload" },
       {
         property: "og:description",
-        content: "Consent-based screening profiles and follow-up tracking for DUT staff.",
+        content: "Consent-based screening profiles and follow-up tracking for [UNIVERSITY NAME] staff.",
       },
     ],
   }),
@@ -79,6 +80,7 @@ function StaffCaseload() {
   const hidden = state.users.filter((u) => u.role === "student" && !u.consentShare).length;
   const flagged = rows.filter((r) => r.overall !== "low").length;
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser || currentUser.role === "student") return null;
 
   return (

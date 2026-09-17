@@ -8,6 +8,7 @@ import { buildCheckpoint } from "@/lib/sq/generators";
 import { Countdown, GameRunner, type TaskResult } from "@/components/sq/game/GameRunner";
 import { useSq } from "@/lib/sq/store";
 import { attemptsAccuracy } from "@/lib/sq/analysis";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/checkpoint/$domain")({
   head: ({ params }) => {
@@ -50,6 +51,7 @@ function CheckpointPage() {
     if (ready && !currentUser) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   const finish = (res: TaskResult[]) => {

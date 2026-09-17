@@ -5,6 +5,7 @@ import { BandChip, Card, EmptyState, Meter, SectionTitle } from "@/components/sq
 import { Button } from "@/components/ui/button";
 import { DOMAIN_MAP } from "@/lib/sq/domains";
 import { useSq } from "@/lib/sq/store";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/history")({
   head: () => ({
@@ -33,6 +34,7 @@ function HistoryPage() {
     if (ready && !currentUser) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   const runs = [...progress.levelRuns].reverse().slice(0, 25);
