@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/sq/AppShell";
 import { BandChip, Card, Disclaimer, Meter, SectionTitle } from "@/components/sq/bits";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { DOMAIN_MAP } from "@/lib/sq/domains";
 import { BAND_META, overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { useSq } from "@/lib/sq/store";
@@ -28,9 +30,14 @@ export const Route = createFileRoute("/report")({
 });
 
 function ReportPage() {
-  const { currentUser, progress, ready, generateReport, setConsent } = useSq();
+  const { currentUser, progress, ready, generateReport, setConsent, requestReferral } = useSq();
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
+  const [referralOpen, setReferralOpen] = useState(false);
+  const [referralMessage, setReferralMessage] = useState("");
+  const [contactPreference, setContactPreference] = useState("Email");
+  const [referralSending, setReferralSending] = useState(false);
+  const [referralResult, setReferralResult] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     if (ready && !currentUser) navigate({ to: "/login" });
@@ -38,6 +45,28 @@ function ReportPage() {
 
   if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
+
+  const submitReferral = async () => {
+    setReferralSending(true);
+    setReferralResult(null);
+    setConsent(true);
+    generateReport();
+    const error = await requestReferral({
+      message: referralMessage.trim() || "I would like to discuss my screening results and explore support options.",
+      contactPreference,
+    });
+    setReferralSending(false);
+    if (error) {
+      setReferralResult({ ok: false, text: error });
+    } else {
+      setReferralResult({
+        ok: true,
+        text: "Your referral has been sent to the Disability Unit. They will reach out to you soon.",
+      });
+      setReferralOpen(false);
+      setReferralMessage("");
+    }
+  };
 
   const domains = summariseAll(progress);
   const overall = overallBand(domains);
@@ -166,7 +195,8 @@ function ReportPage() {
           <p className="mt-2 max-w-2xl text-white/70">
             The Disability Unit offers confidential conversations, professional assessment and
             practical accommodations — extra writing time, alternative assessment formats, reading
-            support and more. Bringing this report along gives them a useful starting point.
+            support and more. Submit a referral below and they'll receive your screening report
+            and reach out to you.
           </p>
           <dl className="mt-5 grid gap-4 text-sm text-white/80 sm:grid-cols-3">
             <div>
@@ -192,22 +222,90 @@ function ReportPage() {
             Placeholder contact details — replace with the real Disability Unit's information before
             launch.
           </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Button
-              size="lg"
-              onClick={() => {
-                setConsent(true);
-                setSaved(true);
-                generateReport();
-              }}
+
+          {referralResult && (
+            <div
+              role="alert"
+              className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
+                referralResult.ok
+                  ? "border-success/30 bg-success/10 text-success"
+                  : "border-destructive/30 bg-destructive/10 text-destructive"
+              }`}
             >
-              Share my report & request contact
-            </Button>
-            <span className="text-sm text-white/60">
-              {currentUser.consentShare
-                ? "Sharing is currently ON — you can switch it off in your profile."
-                : "Sharing is currently OFF — nothing leaves your account."}
-            </span>
+              <span aria-hidden>{referralResult.ok ? "✓ " : "⚠ "}</span>
+              {referralResult.text}
+            </div>
+          )}
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            {!referralOpen ? (
+              <>
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    setConsent(true);
+                    setSaved(true);
+                    generateReport();
+                    setReferralOpen(true);
+                  }}
+                >
+                  Share my report & request contact
+                </Button>
+                <span className="text-sm text-white/60">
+                  {currentUser.consentShare
+                    ? "Sharing is currently ON — you can switch it off in your profile."
+                    : "Sharing is currently OFF — nothing leaves your account."}
+                </span>
+              </>
+            ) : (
+              <div className="w-full max-w-xl space-y-4">
+                <div>
+                  <Label htmlFor="contact-pref" className="text-white">
+                    Preferred contact method
+                  </Label>
+                  <select
+                    id="contact-pref"
+                    className="mt-1.5 h-11 w-full rounded-md border border-white/20 bg-white/10 px-3 text-sm text-white"
+                    value={contactPreference}
+                    onChange={(e) => setContactPreference(e.target.value)}
+                  >
+                    <option value="Email" className="text-black">Email</option>
+                    <option value="Phone call" className="text-black">Phone call</option>
+                    <option value="In-person appointment" className="text-black">In-person appointment</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="referral-msg" className="text-white">
+                    Message to the Disability Unit (optional)
+                  </Label>
+                  <textarea
+                    id="referral-msg"
+                    rows={4}
+                    className="mt-1.5 w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40"
+                    placeholder="Describe what you'd like help with, or leave blank to send your screening report only."
+                    value={referralMessage}
+                    onChange={(e) => setReferralMessage(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button size="lg" disabled={referralSending} onClick={submitReferral}>
+                    {referralSending ? "Sending referral…" : "Send referral to Disability Unit"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-white/20 text-white hover:bg-white/10"
+                    onClick={() => setReferralOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+                <p className="text-xs text-white/50">
+                  By sending, you consent to sharing your screening report with the Disability Unit.
+                  You can withdraw this at any time in your profile settings.
+                </p>
+              </div>
+            )}
           </div>
         </Card>
       </section>
