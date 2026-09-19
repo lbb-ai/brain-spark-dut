@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSq } from "@/lib/sq/store";
 import { supabase } from "@/integrations/supabase/client";
-import { seedDemoAccountsClient } from "@/lib/sq/seed-demo-accounts.client";
+import { seedDemoAccountsClient } from "@/lib/sq/seed-demo-accounts";
 import { Logo } from "@/components/sq/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
