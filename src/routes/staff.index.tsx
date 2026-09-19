@@ -23,7 +23,7 @@ export const Route = createFileRoute("/staff/")({
       { property: "og:title", content: "SkillQuest Disability Unit caseload" },
       {
         property: "og:description",
-        content: "Consent-based screening profiles and follow-up tracking for [UNIVERSITY NAME] staff.",
+        content: "Consent-based screening profiles and follow-up tracking for DUT staff.",
       },
     ],
   }),

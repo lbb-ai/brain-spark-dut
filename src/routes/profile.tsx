@@ -82,7 +82,7 @@ function ProfilePage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <Label htmlFor="consent-switch" className="text-base font-semibold">
-                  Share my screening report with the [UNIVERSITY NAME] Disability Unit
+                  Share my screening report with the DUT Disability Unit
                 </Label>
                 <p className="mt-1 text-sm text-muted-foreground">
                   When on, authorised Disability Unit staff can see your skill profile and history so

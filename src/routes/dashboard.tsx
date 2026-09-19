@@ -242,7 +242,7 @@ function Dashboard() {
           <Card className="mt-4 border-primary/30 bg-primary/5">
             <h3 className="font-display font-bold">Need to talk to someone?</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              The [UNIVERSITY NAME] Disability Unit offers confidential support and professional
+              The DUT Disability Unit offers confidential support and professional
               assessment.
             </p>
             <Button asChild className="mt-3 w-full">

@@ -41,7 +41,7 @@ function Landing() {
           <Logo />
           <span className="font-display text-lg font-bold text-white">SkillQuest</span>
           <span className="ml-2 hidden rounded-full border border-white/20 px-2.5 py-1 text-[11px] font-semibold text-white/80 sm:inline">
-            [UNIVERSITY NAME] — Disability Unit
+            DUT — Disability Unit
           </span>
           <nav aria-label="Landing" className="ml-auto flex items-center gap-2">
             <Link
@@ -80,7 +80,7 @@ function Landing() {
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/75">
                 SkillQuest turns early learning-disability screening into a brain-training game.
                 Earn XP, build streaks, climb levels — and get a plain-language skill profile you
-                can take to the [UNIVERSITY NAME] Disability Unit if you want support.
+                can take to the DUT Disability Unit if you want support.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg" className="h-13 px-7 text-base">
@@ -115,7 +115,7 @@ function Landing() {
             </div>
 
             <div className="relative">
-              <div className="animate-float rounded-3xl border border-white/12 bg-white/[0.06] p-5 backdrop-blur">
+              <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-5 backdrop-blur">
                 <p className="text-xs font-semibold uppercase tracking-wide text-cyan">
                   Live skill profile
                 </p>
@@ -222,12 +222,11 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-4 text-sm text-muted-foreground sm:px-6">
           <p>
             SkillQuest is a screening indicator, not a medical or psychological diagnosis. If you
-            have concerns about your learning experience, contact the [UNIVERSITY NAME] Disability
+            have concerns about your learning experience, contact the DUT Disability
             Unit for professional assessment and support.
           </p>
           <p className="mt-3 text-xs">
-            [UNIVERSITY NAME] · Disability Unit Intervention Project · Placeholder branding — replace
-            before launch
+            Durban University of Technology · Disability Unit Intervention Project
           </p>
         </div>
       </footer>

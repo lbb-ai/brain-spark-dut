@@ -13,6 +13,7 @@ import { DOMAIN_IDS, type DomainId } from "./domains";
 import { buildReport } from "./analysis";
 import { emptyProgress } from "./seed";
 import { sendReferralEmail } from "./referral-email.server";
+import { sendSlackReferralNotification } from "./slack-notify.server";
 import type {
   AccessibilitySettings,
   AttemptRecord,
@@ -689,12 +690,17 @@ export function SqProvider({ children }: { children: ReactNode }) {
         ],
       }));
       try {
-        const result = await sendReferralEmail({ data: { referralId: data.id } });
-        if (result.emailStatus) {
+        const [emailResult, slackResult] = await Promise.all([
+          sendReferralEmail({ data: { referralId: data.id } }),
+          sendSlackReferralNotification({ data: { referralId: data.id } }),
+        ]);
+        if (emailResult.emailStatus || slackResult.slackStatus) {
           setState((s) => ({
             ...s,
             referrals: s.referrals.map((r) =>
-              r.id === data.id ? { ...r, emailStatus: result.emailStatus } : r,
+              r.id === data.id
+                ? { ...r, emailStatus: emailResult.emailStatus ?? r.emailStatus }
+                : r,
             ),
           }));
         }

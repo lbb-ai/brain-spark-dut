@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const DEMO_ACCOUNTS = [
+  { label: "Student", email: "demo.student@dut4life.ac.za", password: "SkillQuestDemo1!" },
+  { label: "Staff", email: "demo.staff@dut4life.ac.za", password: "SkillQuestDemo1!" },
+  { label: "Admin", email: "demo.admin@dut4life.ac.za", password: "SkillQuestDemo1!" },
+];
+
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
@@ -228,15 +234,41 @@ function LoginPage() {
               )}
 
               {mode === "signin" && (
-                <p className="mt-6 text-sm text-muted-foreground">
-                  New here?{" "}
-                  <Link
-                    to="/register"
-                    className="font-semibold text-primary underline-offset-2 hover:underline"
-                  >
-                    Create a student account
-                  </Link>
-                </p>
+                <>
+                  <p className="mt-6 text-sm text-muted-foreground">
+                    New here?{" "}
+                    <Link
+                      to="/register"
+                      className="font-semibold text-primary underline-offset-2 hover:underline"
+                    >
+                      Create a student account
+                    </Link>
+                  </p>
+                  <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Demo accounts
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Click to fill credentials, then sign in.
+                    </p>
+                    <div className="mt-3 space-y-2">
+                      {DEMO_ACCOUNTS.map((acc) => (
+                        <button
+                          key={acc.label}
+                          type="button"
+                          className="flex w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm transition-colors hover:bg-accent"
+                          onClick={() => {
+                            setEmail(acc.email);
+                            setPassword(acc.password);
+                          }}
+                        >
+                          <span className="font-medium">{acc.label}</span>
+                          <span className="text-xs text-muted-foreground">{acc.email}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
             </>
           )}

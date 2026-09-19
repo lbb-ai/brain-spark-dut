@@ -17,7 +17,7 @@ export const Route = createFileRoute("/report")({
       {
         name: "description",
         content:
-          "A plain-language SkillQuest skill profile across six domains, with a clear route to [UNIVERSITY NAME] Disability Unit support. Screening only, never a diagnosis.",
+          "A plain-language SkillQuest skill profile across six domains, with a clear route to DUT Disability Unit support. Screening only, never a diagnosis.",
       },
       { property: "og:title", content: "My SkillQuest screening report" },
       {
@@ -190,7 +190,7 @@ function ReportPage() {
       <section id="support" className="mt-10 scroll-mt-24">
         <Card className="surface-night p-8">
           <h2 className="font-display text-2xl font-bold text-white">
-            Talk to the [UNIVERSITY NAME] Disability Unit
+            Talk to the DUT Disability Unit
           </h2>
           <p className="mt-2 max-w-2xl text-white/70">
             The Disability Unit offers confidential conversations, professional assessment and
@@ -201,27 +201,23 @@ function ReportPage() {
           <dl className="mt-5 grid gap-4 text-sm text-white/80 sm:grid-cols-3">
             <div>
               <dt className="font-semibold text-white">Where</dt>
-              <dd className="rounded-md border border-dashed border-white/30 px-2 py-1 text-white/60">
-                [Disability Unit location — to be added]
+              <dd className="rounded-md border border-white/20 px-2 py-1 text-white/70">
+                DUT Disability Unit, Steve Biko Campus, Durban
               </dd>
             </div>
             <div>
               <dt className="font-semibold text-white">Email</dt>
-              <dd className="rounded-md border border-dashed border-white/30 px-2 py-1 text-white/60">
-                [Disability Unit email — to be added]
+              <dd className="rounded-md border border-white/20 px-2 py-1 text-white/70">
+                disabilityunit@dut.ac.za
               </dd>
             </div>
             <div>
               <dt className="font-semibold text-white">Booking</dt>
-              <dd className="rounded-md border border-dashed border-white/30 px-2 py-1 text-white/60">
-                [Booking link / process — to be added]
+              <dd className="rounded-md border border-white/20 px-2 py-1 text-white/70">
+                Visit the Disability Unit office or call +27 31 373 2000
               </dd>
             </div>
           </dl>
-          <p className="mt-3 text-xs text-white/40">
-            Placeholder contact details — replace with the real Disability Unit's information before
-            launch.
-          </p>
 
           {referralResult && (
             <div

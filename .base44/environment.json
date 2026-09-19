@@ -26,6 +26,12 @@
       "description": "The verified sender email address for outgoing referral emails (e.g. SkillQuest <noreply@yourdomain.com>) — must be a domain verified in your Resend account",
       "requiredAtBoot": false,
       "generatedForDevelopment": true
+    },
+    {
+      "name": "SLACK_WEBHOOK_URL",
+      "description": "Slack incoming webhook URL — create one at api.slack.com/messaging/webhooks (choose your channel, e.g. #disability-unit-referrals)",
+      "requiredAtBoot": false,
+      "generatedForDevelopment": false
     }
   ]
 }
