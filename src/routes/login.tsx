@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSq } from "@/lib/sq/store";
 import { supabase } from "@/integrations/supabase/client";
-import { seedDemoAccounts } from "@/lib/sq/seed-demo-accounts.server";
+import { seedDemoAccountsClient } from "@/lib/sq/seed-demo-accounts.client";
 import { Logo } from "@/components/sq/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,17 +59,25 @@ function LoginPage() {
     setSeeding(true);
     setSeedMsg("");
     try {
-      const { results } = await seedDemoAccounts();
+      const { results, needsConfirmation } = await seedDemoAccountsClient();
       const ok = results.filter((r) => r.status === "ok").length;
-      const fail = results.filter((r) => r.status !== "ok");
-      if (fail.length === 0) {
-        setSeedMsg(`✓ Created ${ok} demo account${ok === 1 ? "" : "s"}. You can sign in now.`);
+      const exists = results.filter((r) => r.status === "exists").length;
+      const fail = results.filter((r) => r.status === "error");
+      if (needsConfirmation) {
+        setSeedMsg(
+          `Accounts created but email confirmation is enabled in Supabase. Disable it in Supabase → Authentication → Providers → Email, or confirm each account via email.`,
+        );
+      } else if (fail.length === 0) {
+        const total = ok + exists;
+        setSeedMsg(
+          `✓ ${total} demo account${total === 1 ? "" : "s"} ready (${ok} created, ${exists} already existed). You can sign in now.`,
+        );
       } else {
-        setSeedMsg(`✓ ${ok} ready, ${fail.length} had issues. Check console for details.`);
+        setSeedMsg(`✓ ${ok} created, ${exists} existed, ${fail.length} failed. Check console for details.`);
         console.error("Demo account seeding failures:", fail);
       }
     } catch (err) {
-      setSeedMsg("Could not create demo accounts. Make sure SUPABASE_SERVICE_ROLE_KEY is set.");
+      setSeedMsg("Could not create demo accounts. See console for details.");
       console.error(err);
     }
     setSeeding(false);
