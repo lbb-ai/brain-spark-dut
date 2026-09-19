@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSq } from "@/lib/sq/store";
 import { supabase } from "@/integrations/supabase/client";
+import { seedDemoAccounts } from "@/lib/sq/seed-demo-accounts.server";
 import { Logo } from "@/components/sq/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +52,28 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"signin" | "reset">("signin");
   const [resetSent, setResetSent] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [seedMsg, setSeedMsg] = useState("");
+
+  const handleSeed = async () => {
+    setSeeding(true);
+    setSeedMsg("");
+    try {
+      const { results } = await seedDemoAccounts();
+      const ok = results.filter((r) => r.status === "ok").length;
+      const fail = results.filter((r) => r.status !== "ok");
+      if (fail.length === 0) {
+        setSeedMsg(`✓ Created ${ok} demo account${ok === 1 ? "" : "s"}. You can sign in now.`);
+      } else {
+        setSeedMsg(`✓ ${ok} ready, ${fail.length} had issues. Check console for details.`);
+        console.error("Demo account seeding failures:", fail);
+      }
+    } catch (err) {
+      setSeedMsg("Could not create demo accounts. Make sure SUPABASE_SERVICE_ROLE_KEY is set.");
+      console.error(err);
+    }
+    setSeeding(false);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,6 +290,19 @@ function LoginPage() {
                         </button>
                       ))}
                     </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 w-full"
+                      disabled={seeding}
+                      onClick={handleSeed}
+                    >
+                      {seeding ? "Creating…" : "Create demo accounts"}
+                    </Button>
+                    {seedMsg && (
+                      <p className="mt-2 text-xs text-muted-foreground">{seedMsg}</p>
+                    )}
                   </div>
                 </>
               )}
