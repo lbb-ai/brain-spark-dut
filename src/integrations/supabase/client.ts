@@ -17,13 +17,141 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
       new Headers(init.headers).forEach((value, key) => headers.set(key, value));
     }
 
-    // New Supabase API keys are opaque strings, not bearer JWTs.
     if (isNewSupabaseApiKey(supabaseKey) && headers.get('Authorization') === `Bearer ${supabaseKey}`) {
       headers.delete('Authorization');
     }
 
     headers.set('apikey', supabaseKey);
     return fetch(input, { ...init, headers });
+  };
+}
+
+const LOCAL_DEMO_USERS = {
+  '22418104@dut4life.ac.za': { id: 'local-admin-bhengu', name: 'Mr Bhengu', role: 'admin', password: 'group21' },
+  'demo.lindiwe@dut4life.ac.za': { id: 'local-student-lindiwe', name: 'Lindiwe Mkhize', role: 'student', password: 'SkillQuestDemo1!' },
+  'demo.sipho@dut4life.ac.za': { id: 'local-student-sipho', name: 'Sipho Ndlovu', role: 'student', password: 'SkillQuestDemo1!' },
+  'demo.nomvula@dut4life.ac.za': { id: 'local-student-nomvula', name: 'Nomvula Dube', role: 'student', password: 'SkillQuestDemo1!' },
+  'demo.thabo@dut4life.ac.za': { id: 'local-student-thabo', name: 'Thabo Zwane', role: 'student', password: 'SkillQuestDemo1!' },
+  'demo.zodwa@dut4life.ac.za': { id: 'local-student-zodwa', name: 'Zodwa Mthembu', role: 'student', password: 'SkillQuestDemo1!' },
+  'demo.aphiwe@dut4life.ac.za': { id: 'local-student-aphiwe', name: 'Aphiwe Dlamini', role: 'student', password: 'SkillQuestDemo1!' },
+  'demo.staff@dut4life.ac.za': { id: 'local-staff-zanele', name: 'Zanele Khumalo', role: 'staff', password: 'SkillQuestDemo1!' },
+  'demo.nomsa@dut4life.ac.za': { id: 'local-admin-nomsa', name: 'Nomsa Dlamini', role: 'admin', password: 'SkillQuestDemo1!' },
+} as const;
+
+const LOCAL_DEMO_SESSION_KEY = 'skillquest.local-demo-session.v1';
+
+function readLocalDemoEmail(): string | null {
+  if (typeof window === 'undefined') return null;
+  const value = window.localStorage.getItem(LOCAL_DEMO_SESSION_KEY);
+  return value && value.trim().toLowerCase() in LOCAL_DEMO_USERS ? value.trim().toLowerCase() : null;
+}
+
+function toDemoUser(email: string) {
+  const account = LOCAL_DEMO_USERS[email as keyof typeof LOCAL_DEMO_USERS];
+  return {
+    id: account.id,
+    aud: 'authenticated',
+    role: 'authenticated',
+    email,
+    email_confirmed_at: new Date(0).toISOString(),
+    user_metadata: {
+      name: account.name,
+      demo: true,
+      role: account.role,
+    },
+    app_metadata: { provider: 'demo', providers: ['demo'] },
+    created_at: new Date(0).toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function makeLocalDemoTable() {
+  return {
+    select: () => makeLocalDemoTable(),
+    eq: () => makeLocalDemoTable(),
+    order: () => makeLocalDemoTable(),
+    limit: () => makeLocalDemoTable(),
+    delete: async () => ({ data: null, error: null }),
+    insert: async (value: unknown) => ({ data: value, error: null }),
+    update: async (value: unknown) => ({ data: value, error: null }),
+    upsert: async (value: unknown) => ({ data: value, error: null }),
+    maybeSingle: async () => ({ data: null, error: null }),
+    single: async () => ({ data: null, error: null }),
+  };
+}
+
+function createLocalDemoSupabase() {
+  return {
+    auth: {
+      signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
+        const normalized = email.trim().toLowerCase();
+        const account = LOCAL_DEMO_USERS[normalized as keyof typeof LOCAL_DEMO_USERS];
+
+        if (!account || account.password !== password) {
+          return {
+            data: { user: null, session: null },
+            error: { message: 'Invalid login credentials' },
+          };
+        }
+
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(LOCAL_DEMO_SESSION_KEY, normalized);
+        }
+
+        const user = toDemoUser(normalized);
+        const session = {
+          access_token: `demo.${btoa(normalized)}.session`,
+          token_type: 'bearer',
+          expires_in: 60 * 60 * 24 * 365,
+          expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+          refresh_token: `demo-refresh-${normalized}`,
+          user,
+        };
+
+        return { data: { user, session }, error: null };
+      },
+      getSession: async () => {
+        const email = readLocalDemoEmail();
+        if (!email) return { data: { session: null }, error: null };
+        const user = toDemoUser(email);
+        return {
+          data: {
+            session: {
+              access_token: `demo.${btoa(email)}.session`,
+              token_type: 'bearer',
+              expires_in: 60 * 60 * 24 * 365,
+              expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+              refresh_token: `demo-refresh-${email}`,
+              user,
+            },
+          },
+          error: null,
+        };
+      },
+      getUser: async () => {
+        const email = readLocalDemoEmail();
+        if (!email) return { data: { user: null }, error: null };
+        return { data: { user: toDemoUser(email) }, error: null };
+      },
+      onAuthStateChange: () => ({
+        data: {
+          subscription: {
+            unsubscribe: () => undefined,
+          },
+        },
+      }),
+      signOut: async () => {
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(LOCAL_DEMO_SESSION_KEY);
+        }
+        return { error: null };
+      },
+      resetPasswordForEmail: async () => ({ error: null }),
+    },
+    from: () => makeLocalDemoTable(),
+    functions: {
+      invoke: async () => ({ data: null, error: null }),
+    },
   };
 }
 
@@ -74,8 +202,6 @@ function demoUser(email: DemoEmail) {
 }
 
 function demoSession(email: DemoEmail) {
-  // The token is deliberately only a local marker. Demo data is never used to
-  // authorize server-side operations; normal Supabase auth remains unchanged.
   return {
     access_token: `demo.${btoa(email)}.session`,
     token_type: 'bearer',
@@ -169,19 +295,11 @@ function createDemoAuth(realAuth: any): any {
 }
 
 function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
   const SUPABASE_URL = import.meta.env['VITE_SUPABASE_URL'] || process.env['SUPABASE_URL'];
   const SUPABASE_PUBLISHABLE_KEY = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || process.env['SUPABASE_PUBLISHABLE_KEY'];
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    return createLocalDemoSupabase() as ReturnType<typeof createSupabaseClient>;
   }
 
   const client = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -201,8 +319,6 @@ function createSupabaseClient() {
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
 let _demoAuth: any;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
     if (!_supabase) _supabase = createSupabaseClient();
@@ -210,3 +326,6 @@ export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>,
     return prop === 'auth' ? _demoAuth : Reflect.get(_supabase, prop, receiver);
   },
 });
+
+export const demoLocalUsers = LOCAL_DEMO_USERS;
+export const isDemoLocalMode = true;
