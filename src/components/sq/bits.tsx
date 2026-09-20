@@ -124,8 +124,8 @@ export function Disclaimer({ className }: { className?: string }) {
     >
       <strong className="text-foreground">Please read: </strong>
       This result is a screening indicator, not a medical or psychological diagnosis. If you have
-      concerns about your learning experience, consider contacting the DUT Disability Unit for
-      professional assessment and support.
+      concerns about your learning experience, consider contacting the Durban University of
+      Technology Disability Unit for professional assessment and support.
     </p>
   );
 }

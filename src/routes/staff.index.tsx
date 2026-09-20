@@ -8,6 +8,7 @@ import { overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysi
 import { useSq } from "@/lib/sq/store";
 import type { Band } from "@/lib/sq/types";
 import { Lock } from "lucide-react";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 
 export const Route = createFileRoute("/staff/")({
@@ -79,6 +80,7 @@ function StaffCaseload() {
   const hidden = state.users.filter((u) => u.role === "student" && !u.consentShare).length;
   const flagged = rows.filter((r) => r.overall !== "low").length;
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser || currentUser.role === "student") return null;
 
   return (

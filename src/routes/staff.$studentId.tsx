@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DOMAIN_MAP } from "@/lib/sq/domains";
 import { BAND_META, overallBand, screeningCompletion, summariseAll } from "@/lib/sq/analysis";
 import { useSq } from "@/lib/sq/store";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/staff/$studentId")({
   head: () => ({
@@ -53,6 +54,7 @@ function StaffCase() {
   const overall = overallBand(domains);
   const notes = state.notes.filter((n) => n.studentId === studentId);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser || currentUser.role === "student") return null;
 
   if (!student) {

@@ -105,3 +105,13 @@ export interface AuditEntry {
   action: string;
   at: string;
 }
+
+export interface Referral {
+  id: string;
+  studentId: string;
+  message: string;
+  contactPreference: string;
+  status: string;
+  emailStatus: string;
+  createdAt: string;
+}

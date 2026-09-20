@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AppShell } from "@/components/sq/AppShell";
 import { Card, SectionTitle } from "@/components/sq/bits";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useSq } from "@/lib/sq/store";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 import type { AccessibilitySettings } from "@/lib/sq/types";
 
 export const Route = createFileRoute("/settings")({
@@ -54,7 +56,15 @@ const OPTIONS: { key: keyof AccessibilitySettings; title: string; body: string }
 ];
 
 function SettingsPage() {
-  const { state, updateSettings } = useSq();
+  const { state, updateSettings, currentUser, ready } = useSq();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (ready && !currentUser) navigate({ to: "/login" });
+  }, [ready, currentUser, navigate]);
+
+  if (!ready) return <FullScreenLoader />;
+  if (!currentUser) return null;
 
   return (
     <AppShell>

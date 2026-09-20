@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useSq, levelFromXp } from "@/lib/sq/store";
 import { screeningCompletion } from "@/lib/sq/analysis";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -35,6 +36,7 @@ function ProfilePage() {
     if (ready && !currentUser) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
 
   return (

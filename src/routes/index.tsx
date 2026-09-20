@@ -41,7 +41,7 @@ function Landing() {
           <Logo />
           <span className="font-display text-lg font-bold text-white">SkillQuest</span>
           <span className="ml-2 hidden rounded-full border border-white/20 px-2.5 py-1 text-[11px] font-semibold text-white/80 sm:inline">
-            DUT Disability Unit
+            DUT — Disability Unit
           </span>
           <nav aria-label="Landing" className="ml-auto flex items-center gap-2">
             <Link
@@ -115,7 +115,7 @@ function Landing() {
             </div>
 
             <div className="relative">
-              <div className="animate-float rounded-3xl border border-white/12 bg-white/[0.06] p-5 backdrop-blur">
+              <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-5 backdrop-blur">
                 <p className="text-xs font-semibold uppercase tracking-wide text-cyan">
                   Live skill profile
                 </p>
@@ -222,8 +222,8 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-4 text-sm text-muted-foreground sm:px-6">
           <p>
             SkillQuest is a screening indicator, not a medical or psychological diagnosis. If you
-            have concerns about your learning experience, contact the DUT Disability Unit for
-            professional assessment and support.
+            have concerns about your learning experience, contact the DUT Disability
+            Unit for professional assessment and support.
           </p>
           <p className="mt-3 text-xs">
             Durban University of Technology · Disability Unit Intervention Project

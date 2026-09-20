@@ -6,6 +6,7 @@ import { DOMAINS, tierForLevel } from "@/lib/sq/domains";
 import { useSq } from "@/lib/sq/store";
 import { Button } from "@/components/ui/button";
 import { summariseAll } from "@/lib/sq/analysis";
+import { FullScreenLoader } from "@/components/sq/FullScreenLoader";
 
 export const Route = createFileRoute("/play/")({
   head: () => ({
@@ -34,6 +35,7 @@ function GameSelection() {
     if (ready && !currentUser) navigate({ to: "/login" });
   }, [ready, currentUser, navigate]);
 
+  if (!ready) return <FullScreenLoader />;
   if (!currentUser) return null;
   const summaries = summariseAll(progress);
 
