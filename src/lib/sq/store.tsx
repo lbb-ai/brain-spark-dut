@@ -29,6 +29,35 @@ import type {
 
 const SETTINGS_KEY = "skillquest.settings.v1";
 
+function resolveUserRole(
+  rolesData: Array<{ role?: string }> | null | undefined,
+  metadataRole: unknown,
+): SqUser["role"] {
+  const rank = { student: 0, staff: 1, admin: 2 } as const;
+  const validRoles = ["student", "staff", "admin"] as const;
+
+  let role: SqUser["role"] = "student";
+  if (
+    typeof metadataRole === "string" &&
+    validRoles.includes(metadataRole as (typeof validRoles)[number])
+  ) {
+    role = metadataRole as SqUser["role"];
+  }
+
+  for (const r of rolesData ?? []) {
+    const candidate =
+      typeof r?.role === "string" && validRoles.includes(r.role as (typeof validRoles)[number])
+        ? (r.role as SqUser["role"])
+        : null;
+
+    if (candidate && rank[candidate] > rank[role]) {
+      role = candidate;
+    }
+  }
+
+  return role;
+}
+
 interface SqState {
   users: SqUser[];
   progress: Record<string, StudentProgress>;
@@ -308,13 +337,14 @@ export function SqProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", userId),
       ]);
 
-      // Auto-create profile + role if missing (e.g. after email confirmation
-      // when no database trigger exists to seed them at signup time).
       let profileData = profile;
       let rolesData = roles;
       if (!profileData) {
         const { data: authUser } = await supabase.auth.getUser();
         const meta = (authUser?.user?.user_metadata ?? {}) as Record<string, unknown>;
+        const metadataRole = meta.role;
+        const initialRole = resolveUserRole([], metadataRole);
+
         const { data: inserted } = await supabase
           .from("profiles")
           .insert({
@@ -328,8 +358,9 @@ export function SqProvider({ children }: { children: ReactNode }) {
           })
           .select("*")
           .maybeSingle();
+
         if (inserted) profileData = inserted;
-        await supabase.from("user_roles").insert({ user_id: userId, role: "student" });
+        await supabase.from("user_roles").insert({ user_id: userId, role: initialRole });
         const { data: newRoles } = await supabase
           .from("user_roles")
           .select("role")
@@ -337,12 +368,10 @@ export function SqProvider({ children }: { children: ReactNode }) {
         rolesData = newRoles;
       }
 
-      const rank = { student: 0, staff: 1, admin: 2 } as const;
-      let role: SqUser["role"] = "student";
-      for (const r of rolesData ?? []) {
-        const candidate = r.role as SqUser["role"];
-        if (rank[candidate] > rank[role]) role = candidate;
-      }
+      const { data: authUser } = await supabase.auth.getUser();
+      const metadataRole = authUser?.user?.user_metadata?.role;
+      const role = resolveUserRole(rolesData ?? [], metadataRole);
+
       if (profileData) {
         setCurrentUser({
           id: profileData.id,
@@ -450,12 +479,7 @@ export function SqProvider({ children }: { children: ReactNode }) {
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id);
-      const rank = { student: 0, staff: 1, admin: 2 } as const;
-      let role: SqUser["role"] = "student";
-      for (const r of roles ?? []) {
-        const c = r.role as SqUser["role"];
-        if (rank[c] > rank[role]) role = c;
-      }
+      const role = resolveUserRole(roles ?? [], data.user.user_metadata?.role);
       const user: SqUser = {
         id: data.user.id,
         name: profile?.name || data.user.email || "",
@@ -488,8 +512,6 @@ export function SqProvider({ children }: { children: ReactNode }) {
         },
       });
       if (error || !data.user) return { user: null, error: error?.message ?? "Sign up failed" };
-      // Email confirmation is enabled — no session is returned until the user
-      // verifies their email. Tell the UI to show a "check your inbox" state.
       if (!data.session) {
         return { user: null, needsEmailConfirmation: true };
       }
@@ -776,3 +798,4 @@ export function levelFromXp(xp: number) {
 export function xpIntoLevel(xp: number) {
   return xp % 500;
 }
+

@@ -26,6 +26,11 @@ const STAFF_NAV: NavItem[] = [
 const ADMIN_NAV: NavItem[] = [
   { to: "/admin", label: "Admin" },
   { to: "/staff", label: "Caseload" },
+  { to: "/dashboard", label: "Student dashboard" },
+  { to: "/play", label: "Play" },
+  { to: "/report", label: "Reports" },
+  { to: "/history", label: "History" },
+  { to: "/profile", label: "Profile" },
   { to: "/settings", label: "Settings" },
 ];
 
@@ -68,10 +73,7 @@ export function AppShell({
             <span className="font-display text-lg font-bold tracking-tight">SkillQuest</span>
           </Link>
 
-          <nav
-            aria-label="Main"
-            className="ml-6 hidden items-center gap-1 md:flex"
-          >
+          <nav aria-label="Main" className="ml-6 hidden items-center gap-1 md:flex">
             {nav.map((item) => (
               <Link
                 key={item.to}
@@ -175,3 +177,4 @@ export function Logo({ className }: { className?: string }) {
     </span>
   );
 }
+
