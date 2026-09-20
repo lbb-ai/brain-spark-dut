@@ -27,6 +27,146 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
+const DEMO_USERS = {
+  'demo.student@dut4life.ac.za': {
+    id: '00000000-0000-4000-8000-000000000001',
+    name: 'Demo Student',
+    role: 'student',
+  },
+  'demo.staff@dut4life.ac.za': {
+    id: '00000000-0000-4000-8000-000000000002',
+    name: 'Demo Staff',
+    role: 'staff',
+  },
+  'demo.admin@dut4life.ac.za': {
+    id: '00000000-0000-4000-8000-000000000003',
+    name: 'Demo Admin',
+    role: 'admin',
+  },
+} as const;
+
+const DEMO_SESSION_KEY = 'skillquest.demo-session.v1';
+
+type DemoEmail = keyof typeof DEMO_USERS;
+type DemoListener = (event: string, session: unknown) => void;
+
+function isDemoEmail(email: string): email is DemoEmail {
+  return email.trim().toLowerCase() in DEMO_USERS;
+}
+
+function demoUser(email: DemoEmail) {
+  const account = DEMO_USERS[email];
+  return {
+    id: account.id,
+    aud: 'authenticated',
+    role: 'authenticated',
+    email,
+    email_confirmed_at: new Date(0).toISOString(),
+    user_metadata: {
+      name: account.name,
+      demo: true,
+      role: account.role,
+    },
+    app_metadata: { provider: 'demo', providers: ['demo'] },
+    created_at: new Date(0).toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function demoSession(email: DemoEmail) {
+  // The token is deliberately only a local marker. Demo data is never used to
+  // authorize server-side operations; normal Supabase auth remains unchanged.
+  return {
+    access_token: `demo.${btoa(email)}.session`,
+    token_type: 'bearer',
+    expires_in: 60 * 60 * 24 * 365,
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+    refresh_token: `demo-refresh-${email}`,
+    user: demoUser(email),
+  };
+}
+
+function createDemoAuth(realAuth: any): any {
+  const listeners = new Set<DemoListener>();
+  let demoEmail: DemoEmail | null = null;
+
+  const readStoredEmail = (): DemoEmail | null => {
+    if (typeof window === 'undefined') return null;
+    const value = window.localStorage.getItem(DEMO_SESSION_KEY);
+    return value && isDemoEmail(value) ? value : null;
+  };
+
+  const currentEmail = () => demoEmail ?? readStoredEmail();
+  const currentSession = () => {
+    const email = currentEmail();
+    return email ? demoSession(email) : null;
+  };
+  const notify = (event: string, session: unknown) => {
+    for (const listener of listeners) listener(event, session);
+  };
+
+  return new Proxy(realAuth, {
+    get(target, property, receiver) {
+      if (property === 'signInWithPassword') {
+        return async ({ email }: { email: string; password: string }) => {
+          const normalized = email.trim().toLowerCase();
+          if (!isDemoEmail(normalized)) return Reflect.get(target, property, receiver).apply(target, arguments as never);
+          demoEmail = normalized;
+          if (typeof window !== 'undefined') window.localStorage.setItem(DEMO_SESSION_KEY, normalized);
+          const session = demoSession(normalized);
+          notify('SIGNED_IN', session);
+          return { data: { user: session.user, session }, error: null };
+        };
+      }
+
+      if (property === 'getSession') {
+        return async () => {
+          const session = currentSession();
+          return session ? { data: { session }, error: null } : Reflect.get(target, property, receiver).apply(target, []);
+        };
+      }
+
+      if (property === 'getUser') {
+        return async () => {
+          const session = currentSession();
+          return session ? { data: { user: session.user }, error: null } : Reflect.get(target, property, receiver).apply(target, []);
+        };
+      }
+
+      if (property === 'signOut') {
+        return async () => {
+          const wasDemo = Boolean(currentEmail());
+          demoEmail = null;
+          if (typeof window !== 'undefined') window.localStorage.removeItem(DEMO_SESSION_KEY);
+          if (wasDemo) {
+            notify('SIGNED_OUT', null);
+            return { error: null };
+          }
+          return Reflect.get(target, property, receiver).apply(target, []);
+        };
+      }
+
+      if (property === 'onAuthStateChange') {
+        return (callback: DemoListener) => {
+          listeners.add(callback);
+          const realSubscription = Reflect.get(target, property, receiver).apply(target, [callback]);
+          return {
+            data: {
+              subscription: {
+                unsubscribe: () => {
+                  listeners.delete(callback);
+                  realSubscription?.data?.subscription?.unsubscribe?.();
+                },
+              },
+            },
+          };
+        };
+      }
+
+      return Reflect.get(target, property, receiver);
+    },
+  });
+}
 
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
@@ -44,7 +184,7 @@ function createSupabaseClient() {
     throw new Error(message);
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  const client = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
       fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
@@ -54,16 +194,19 @@ function createSupabaseClient() {
       autoRefreshToken: true,
     },
   });
+
+  return client;
 }
 
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
+let _demoAuth: any;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
     if (!_supabase) _supabase = createSupabaseClient();
-    return Reflect.get(_supabase, prop, receiver);
+    if (prop === 'auth') _demoAuth ??= createDemoAuth(_supabase.auth);
+    return prop === 'auth' ? _demoAuth : Reflect.get(_supabase, prop, receiver);
   },
 });
-
